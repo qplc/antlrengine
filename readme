@@ -1,0 +1,68 @@
+A simple example: To invoke user defined method(s) by passing an expression to antlr v4 grammar rules.
+
+Given the input,
+"com.antlrengine . util.Util.factorial  (\"TINT:4\")  ,com.antlrengine.util. Util.add  (\"TINT:5\",\"TINT:10\",\"TINT:15\")  ,com.antlrengine . util.Util.   isPalindrom(\"TSTRING:radar\")  "
+
+Above input statement contains list of invalid method signature.
+
+Following are the steps to execute methods:
+- First, to validate given input by executing grammar rules over expression which matches method signature pattern and removes unwanted whitespaces.
+- A tree walker execute all methods sequentially by traversing nodes. The auto-generated listener will keep observing each input node passed by the grammar rule. In this example, each method expression is being listened on function exit call and passed to the visitor to execute it further.
+
+Please note that no action is taken on rule violation. Grammar execution could be failed due to recursive calls.
+Given the input: "factorial  (\"TI NT:4\")"
+Here, ANTLR fails to match data type provided in the input against grammar rules and goes into infinite loop. 
+Solution is to provide method signature agreed with the grammar rules.
+
+############################################################################################
+
+1. Maven configuration
+First, we need to add ANTLR specific dependency and plugin into pom.xml.
+<dependency>
+    <groupId>org.antlr</groupId>
+        <artifactId>antlr4-runtime</artifactId>
+        <version>4.5.1-1</version>
+</dependency>
+Note: As ANTLR does not have history of being backward-compatible, it is better to specify required version.
+
+ANTLR maven plugin configuration (to be added into pom.xml) runs during generate-sources phase and generates both lexer and parser java classes from grammar (.g4) file.
+<plugin>
+    <groupId>org.antlr</groupId>
+        <artifactId>antlr4-maven-plugin</artifactId>
+        <version>4.5.1-1</version>
+        <configuration>
+            <sourceDirectory>src/main/grammar</sourceDirectory>
+                <visitor>true</visitor>
+        </configuration>
+        <executions>
+            <execution>
+                    <id>antlr</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                   </execution>
+    </executions>
+</plugin>
+Note: Create src/main/grammar folder. The plugin expects all grammar files in there.
+
+2. The grammar file (Example.g4) inclusive of all rules to be excuted while test run.
+
+3. Generate source code
+To generate a source code, we shall execute a build script by executing a maven command,
+mvn clean install -DskipTests=true
+The generated source code resides at target/generated-sources/ in the project root directory. In this, example we have implemented interfaces ExampleListener and ExampleVisitor to execute action on each traversed method.
+
+Note: We have only generated ANTLR source code from the grammar file and not yet executed sample application.
+
+4. To invoke a parser
+We have already generated parser by running maven ANTLR-V4 on grammar. Now, to invoke a parser on a compiled grammar file we need to add some lines of code in our test program.
+    
+            ANTLRInputStream ais = new ANTLRInputStream(expression);
+            ExampleLexer lexer = new ExampleLexer(ais);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            ExampleParser parser = new ExampleParser(tokens);
+            parser.addParseListener(new AntlrExampleListener());
+
+5. Run test
+To run the test class, execute maven command 'mvn clean install'.
