@@ -6,13 +6,13 @@ Given the input,
 Above input statement contains list of invalid method signature.
 
 Following are the steps to execute methods:
-- First, to validate given input by executing grammar rules over expression which matches method signature pattern and removes unwanted whitespaces.
-- A tree walker execute all methods sequentially by traversing nodes. The auto-generated listener will keep observing each input node passed by the grammar rule. In this example, each method expression is being listened on function exit call and passed to the visitor to execute it further.
+- First, to validate given input by executing grammar rules over expression which matches the method signature pattern and removes unwanted whitespaces.
+- A tree walker executes all methods sequentially by traversing nodes. The auto-generated listener will keep observing each input node passed by the grammar rule. In this example, each method expression is being listened on function exit call and passed to the visitor to execute it further.
 
 Please note that no action is taken on rule violation. Grammar execution could be failed due to recursive calls.
 Given the input: "factorial  (\"TI NT:4\")"
-Here, ANTLR fails to match data type provided in the input against grammar rules and goes into infinite loop. 
-Solution is to provide method signature agreed with the grammar rules.
+Here, ANTLR fails to match the data type provided in the input against grammar rules and goes into an infinite loop. 
+The solution is to provide the method signature agreed with the grammar rules.
 
 ############################################################################################
 
